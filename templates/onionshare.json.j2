@@ -1,0 +1,10 @@
+{#
+    This is an OnionShare settings file. It sets the initial values
+    for OnionShare's configuration for newly deployed servers.
+#}
+{
+    "data_dir": "{{ onionshare_data_dir }}",
+    "private_key": "{{ onionshare_private_key }}",
+    "public_mode": {{ onionshare_public_mode | bool | lower }},
+    "save_private_key": {{ onionshare_save_private_key | bool | lower }}
+}

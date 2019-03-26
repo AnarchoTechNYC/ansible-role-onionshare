@@ -1,0 +1,51 @@
+---
+# The OS user account name that will run the OnionShare server.
+onionshare_username: onionshare
+
+#onionshare_connection_type: bundled
+
+#onionshare_control_port_address: 127.0.0.1
+
+#onionshare_control_port_port: 9051
+
+# Path to the OnionShare server's `data_dir`, i.e., the filesystem
+# location in which received files will be saved.
+onionshare_data_dir: /var/onionshare/uploads
+
+#onionshare_no_bridges: true
+
+# The Base64-encoded X25519 private key for the Onion service that
+# will be handed to Tor by the OnionShare server. Please take extra
+# care to ensure this value is safely handled and/or encrypted!
+onionshare_private_key: ""
+
+# Whether or not to enable OnionShare's "Public Mode." Refer to the
+# OnionShare wiki for more information:
+# https://github.com/micahflee/onionshare/wiki/Public-Mode
+onionshare_public_mode: true
+
+# Whether or not to use the same private key (Onion service URL) if
+# the OnionShare server gets restarted.
+onionshare_save_private_key: true
+
+#onionshare_shutdown_timeout: false
+
+#onionshare_slug:
+
+#onionshare_socket_file_path: /var/run/tor/control
+
+#onionshare_socks_address: 127.0.0.1
+
+#onionshare_socks_port: 9050
+
+#onionshare_tor_bridges_use_custom_bridges:
+
+#onionshare_tor_bridges_use_meek_lite_azure: false
+
+#onionshare_tor_bridges_use_obfs4: false
+
+#onionshare_use_autoupdate: true
+
+#onionshare_use_legacy_v2_onions: false
+
+#onionshare_use_stealth: false
