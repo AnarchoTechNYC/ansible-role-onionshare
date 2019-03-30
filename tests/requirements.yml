@@ -1,0 +1,4 @@
+---
+- name: tor
+  src: https://github.com/AnarchoTechNYC/ansible-role-tor
+  scm: git

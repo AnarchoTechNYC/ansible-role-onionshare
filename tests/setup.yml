@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  become: true
+  tasks:
+    - name: Install Git.
+      package:
+        name: git
+        state: present
+
+    - name: Install cURL.
+      package:
+        name: curl
+        state: present

@@ -6,7 +6,6 @@
     shell: /usr/sbin/nologin
     comment: OnionShare receiving server
     home: "{{ onionshare_user_home_dir }}"
-    password_lock: true
 
 - name: Clone OnionShare repository.
   git:
