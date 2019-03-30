@@ -1,0 +1,31 @@
+[Unit]
+Description=Main OnionShare receiving server
+Documentation=https://OnionShare.org/
+Documentation=https://github.com/micahflee/onionshare/wiki
+Requires=tor.service
+
+[Service]
+User={{ onionshare_username }}
+Group={{ onionshare_username }}
+UMask=0027
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/usr/bin/onionshare --receive --config /etc/onionshare/onionshare.json
+Restart=on-failure
+# Extra security precautions
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+PrivateUsers=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ReadWritePaths=/etc/onionshare/onionshare.json
+RestrictAddressFamilies=AF_UNIX AF_INET
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target

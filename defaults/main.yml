@@ -2,6 +2,9 @@
 # The OS user account name that will run the OnionShare server.
 onionshare_username: onionshare
 
+# The home directory of the OnionShare server's user account.
+onionshare_user_home_dir: /var/onionshare
+
 #onionshare_connection_type: bundled
 
 #onionshare_control_port_address: 127.0.0.1
@@ -10,7 +13,7 @@ onionshare_username: onionshare
 
 # Path to the OnionShare server's `data_dir`, i.e., the filesystem
 # location in which received files will be saved.
-onionshare_data_dir: /var/onionshare/uploads
+onionshare_data_dir: "{{ onionshare_user_home_dir }}/uploads"
 
 #onionshare_no_bridges: true
 

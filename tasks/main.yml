@@ -5,7 +5,7 @@
     system: true
     shell: /usr/sbin/nologin
     comment: OnionShare receiving server
-    create_home: false
+    home: "{{ onionshare_user_home_dir }}"
     password_lock: true
 
 - name: Clone OnionShare repository.
@@ -25,13 +25,15 @@
 
 - name: Install and build OnionShare for Debian-derived OS.
   when: ansible_os_family == "Debian"
+  block:
     - name: Install dependencies for Debian-derived OS.
       apt:
         name: "{{ item }}"
       loop:
         - python3-pyqt5
         - python3-socks
-        - python3-distutils
+        # This package is not found. Deprecated?
+        #- python3-distutils
         - python-nautilus
         - obfs4proxy
         - build-essential
@@ -41,34 +43,82 @@
         - dh-python
 
     - name: Build OnionShare Debian package.
+      register: onionshare_built
       command: ./install/build_deb.sh
       args:
         chdir: /usr/local/src/onionshare
         creates: /usr/local/src/onionshare/deb_dist
 
     - name: Install OnionShare Debian package.
-      command: echo TK-TODO: Installing .deb
-
-- name: Install dependencies for RedHat-dervied OS.
-  when: ansible_os_family == "RedHat"
-  when: 
-  dnf:
-    name: "{{ item }}"
-  loop:
-    - python3-qt5
-    - python3-pysocks
-    - nautilus-python
-    - obfs4
-    - rpm-build
-
-    - name: Build OnionShare RPM package.
-      command: ./install/build_rpm.sh
+      when: onionshare_built is changed
+      shell: dpkg --install ./deb_dist/onionshare_*.deb
       args:
         chdir: /usr/local/src/onionshare
 
+- name: Install and build OnionShare for RedHat-derived OS.
+  when: ansible_os_family == "RedHat"
+  block:
+    - name: Install dependencies for RedHat-dervied OS.
+      dnf:
+        name: "{{ item }}"
+      loop:
+        - python3-qt5
+        - python3-pysocks
+        - nautilus-python
+        - obfs4
+        - rpm-build
+
+    - name: Build OnionShare RPM package.
+      register: onionshare_built
+      command: ./install/build_rpm.sh
+      args:
+        chdir: /usr/local/src/onionshare
+        creates: TK-TODO # TODO: What file is built?
+
     - name: Install OnionShare RPM package.
-      command: echo TK-TODO: Installing .rpm
+      when: onionshare_built is changed
+      command: "echo TK-TODO: Installing .rpm"
+      args:
+        chdir: /usr/local/src/onionshare
+
+- name: Create OnionShare systemd service unit.
+  template:
+    src: onionshare.service.j2
+    dest: /etc/systemd/system/onionshare.service
+  notify: Restart OnionShare.
+
+- name: Create OnionShare configuration directories.
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ onionshare_username }}"
+    group: "{{ onionshare_username }}"
+    mode: "700"
+  loop:
+    - /etc/onionshare
+    - "{{ onionshare_user_home_dir }}/.config/onionshare"
 
 - name: Write initial OnionShare configuration file.
+  register: onionshare_config_written
   template:
-    # TODO
+    src: onionshare.json.j2
+    dest: "{{ onionshare_user_home_dir }}/.config/onionshare/onionshare.json-initial"
+    owner: "{{ onionshare_username }}"
+    group: "{{ onionshare_username }}"
+    mode: "600"
+
+- name: Copy initial OnionShare configuration to system path.
+  when: onionshare_config_written is changed
+  copy:
+    remote_src: true
+    src: "{{ onionshare_user_home_dir }}/.config/onionshare/onionshare.json-initial" 
+    dest: /etc/onionshare/onionshare.json
+    owner: "{{ onionshare_username }}"
+    group: "{{ onionshare_username }}"
+    mode: "600"
+  notify: Restart OnionShare.
+
+- name: Enable OnionShare server.
+  service:
+    name: onionshare
+    enabled: true
