@@ -11,6 +11,10 @@
   git:
     repo: https://github.com/micahflee/onionshare.git
     dest: /usr/local/src/onionshare
+    # Remove the force and changed_when lines after they are not needed.
+    # See issue at https://github.com/micahflee/onionshare/issues/1005
+    force: true
+  changed_when: false
 
 # See https://github.com/micahflee/onionshare/blob/master/BUILD.md#gnulinux
 - name: Install dependencies.
@@ -40,6 +44,23 @@
         - python3-all
         - python3-stdeb
         - dh-python
+
+        # We need this to ensure Python package dependencies needed
+        # by OnionShare are met. This is the workaround described in
+        # https://github.com/micahflee/onionshare/issues/1005
+        - python3-pip
+
+    # This is part of the workaround described in the issue tracker:
+    # https://github.com/micahflee/onionshare/issues/1005
+    - name: Ensure Python package dependencies are met.
+      pip:
+        executable: pip3
+        name: Flask-HTTPAuth
+    - name: Remove python3-flask-httpauth from build requirements.
+      replace:
+        path: /usr/local/src/onionshare/stdeb.cfg
+        regexp: "python3-flask-httpauth, "
+      changed_when: false
 
     - name: Build OnionShare Debian package.
       register: onionshare_built
